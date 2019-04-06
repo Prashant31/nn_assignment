@@ -4,7 +4,7 @@ from flask_script import Command, Option
 class GunicornServer(Command):
     description = 'Run the app within Gunicorn'
 
-    def __init__(self, host='127.0.0.1', port=80, workers=4):
+    def __init__(self, host='127.0.0.1', port=8000, workers=4):
         super().__init__()
         self.port = port
         self.host = host
