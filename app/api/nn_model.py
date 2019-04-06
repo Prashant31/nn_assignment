@@ -22,16 +22,22 @@ def get_nn_model(id):
 
 @api.route('/nn_models', methods=['POST'])
 def create_nn_model():
-    new_model = NnModel(request.json['name'])
-    db.session.add(new_model)
-    db.session.commit()
-    return nn_model_schema.jsonify({"name": new_model.name})
+    new_model = NnModel.query.filter_by(name=request.json['name']).first()
+    if new_model is None:
+        new_model = NnModel(request.json['name'])
+        db.session.add(new_model)
+        db.session.commit()
+        return jsonify({"name": new_model.name})
+    else:
+        return jsonify({"error": "Model with Name already Exists"})
 
 
 @api.route('/nn_models/<int:id>/train', methods=['GET'])
 def train_model(id):
     from ..services import train
     model = NnModel.query.get(id)
+    if model is None:
+        return jsonify("Model With Given Id foes not exist"), 400
     for i in [0.001, 0.01, 0.1]:
         for j in [1, 2, 4]:
             for k in [1000,2000,4000]:
@@ -48,7 +54,8 @@ def train_model(id):
 def test_model(id):
     from ..services import test
     model = NnModel.query.get(id)
-
+    if model is None:
+        return jsonify("Model With Given Id foes not exist"), 400
     # Save Train File may not be necessary
     up_file = request.files.get('image', None)
     if up_file is None:

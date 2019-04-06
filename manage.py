@@ -3,12 +3,14 @@
 import os
 
 from flask_script import Manager
+from GunicornServer import GunicornServer
 
 from app import create_app, db
 
 
 app = create_app(os.getenv('APP_CONFIG', 'default'))
 manager = Manager(app)
+manager.add_command("gunicorn", GunicornServer())
 
 
 @manager.shell
